@@ -1,0 +1,53 @@
+---
+import '../styles/global.css';
+
+import Navbar from '../components/sections/Navbar.astro';
+import Hero from '../components/sections/Hero.astro';
+import Features from '../components/sections/Features.astro';
+import Plans from '../components/sections/Plans.astro';
+import Scenarios from '../components/sections/Scenarios.astro';
+import Billing from '../components/sections/Billing.astro';
+import Steps from '../components/sections/Steps.astro';
+import SiteFooter from '../components/sections/SiteFooter.astro';
+
+import { SITE } from '../data/site';
+import { COPY } from '../data/copy';
+
+const description = `${SITE.brand} · ${COPY.hero.title}。${COPY.hero.subtitle}`;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{SITE.brand} · 云端电竞主机</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#000000" />
+    <meta property="og:title" content={`${SITE.brand} · 云端电竞主机`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+  </head>
+  <body class="min-h-screen bg-ink text-body antialiased">
+    <!-- 1. 顶部导航 -->
+    <Navbar />
+
+    <main>
+      <!-- 2. 首屏 Banner -->
+      <Hero />
+      <!-- 3. 核心特性 -->
+      <Features />
+      <!-- 4. 产品套餐 -->
+      <Plans />
+      <!-- 5. 使用场景 -->
+      <Scenarios />
+      <!-- 6. 计费说明 -->
+      <Billing />
+      <!-- 7. 四步上手 -->
+      <Steps />
+    </main>
+
+    <!-- 8. 页脚 -->
+    <SiteFooter />
+  </body>
+</html>

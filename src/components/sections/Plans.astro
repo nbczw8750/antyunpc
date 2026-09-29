@@ -1,0 +1,83 @@
+---
+/**
+ * 产品套餐：三个档位横向卡片。
+ * 已开放的「畅玩云电脑」「电竞云电脑」为实心高亮并标注「一期开放」，
+ * 展示的价格带「示意」标注；「竞技区云电脑」为降饱和描边、标注「即将上线」，
+ * 配置项与价格位置均显示「即将公布」。
+ * 页面不提供购买或充值入口，示意价不构成报价。
+ */
+import { COPY } from '../../data/copy';
+import { PLANS } from '../../data/plans';
+import { SECTION_IDS } from '../../data/site';
+import SectionHeading from '../ui/SectionHeading.astro';
+import StatusBadge from '../ui/StatusBadge.astro';
+import BackgroundFX from '../ui/BackgroundFX.astro';
+---
+
+<section id={SECTION_IDS.plans} class="relative overflow-hidden py-20 sm:py-24">
+  <BackgroundFX
+    grid="flat"
+    auras={[
+      { variant: 'violet', className: 'right-[-8rem] top-0 h-[24rem] w-[24rem]', opacity: 0.16 },
+    ]}
+  />
+
+  <div class="shell relative z-10 flex flex-col gap-12">
+    <SectionHeading
+      kicker={COPY.plans.kicker}
+      title={COPY.plans.title}
+      subtitle={COPY.plans.subtitle}
+    />
+
+    <ul class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {
+        PLANS.map((plan) => {
+          const isLive = plan.status === 'available';
+          const cardClass = isLive ? 'card-neon' : 'card-muted';
+          const specs = [
+            ['显卡', plan.gpu],
+            ['处理器', plan.cpu],
+            ['内存', plan.ram],
+            ['目标画质', plan.target],
+          ];
+
+          return (
+            <li class={`${cardClass} flex h-full flex-col gap-4 p-6`}>
+              <div class="flex items-start justify-between gap-2">
+                <h3 class="text-lg font-bold text-heading">{plan.name}</h3>
+                <StatusBadge status={plan.status} label={plan.statusLabel} />
+              </div>
+
+              {/* 价格：已开放档位给出示意价并紧邻「示意」标注；未上线档位显示「即将公布」 */}
+              <div class="flex items-baseline gap-2">
+                <span
+                  class={
+                    isLive
+                      ? 'text-2xl font-bold text-neon'
+                      : 'text-2xl font-bold text-body-dim'
+                  }
+                >
+                  {plan.price}
+                </span>
+                {plan.priceNote && <span class="badge-note">{plan.priceNote}</span>}
+              </div>
+
+              <p class="text-sm leading-relaxed text-body">{plan.summary}</p>
+
+              <dl class="mt-1 flex flex-col gap-2 border-t border-line pt-4 text-sm">
+                {specs.map(([label, value]) => (
+                  <div class="flex items-baseline justify-between gap-3">
+                    <dt class="text-body-dim">{label}</dt>
+                    <dd class={isLive ? 'text-body' : 'text-body-dim'}>{value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </li>
+          );
+        })
+      }
+    </ul>
+
+    <p class="text-center text-xs leading-relaxed text-body-dim">{COPY.plans.footnote}</p>
+  </div>
+</section>

@@ -1,0 +1,29 @@
+---
+/**
+ * 区块标题基元：小标题 + 主标题 + 副标题。
+ * 色值与字号全部取自设计令牌生成的语义类，不硬编码色值。
+ */
+interface Props {
+  kicker?: string;
+  title: string;
+  subtitle?: string;
+  align?: 'left' | 'center';
+}
+
+const { kicker, title, subtitle, align = 'center' } = Astro.props;
+const alignClass = align === 'center' ? 'text-center items-center' : 'text-left items-start';
+---
+
+<header class={`flex flex-col gap-3 ${alignClass}`}>
+  {kicker && <p class="section-kicker">{kicker}</p>}
+  <h2 class="text-2xl font-bold leading-snug sm:text-3xl lg:text-4xl">
+    {title}
+  </h2>
+  {
+    subtitle && (
+      <p class="max-w-2xl text-sm leading-relaxed text-body sm:text-base">
+        {subtitle}
+      </p>
+    )
+  }
+</header>

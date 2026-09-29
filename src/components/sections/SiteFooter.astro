@@ -1,0 +1,65 @@
+---
+/**
+ * 页脚：多列布局，含品牌标识、导航链接、客服联系方式、备案信息与版权信息。
+ * 该板块同时是导航「关于我们」与页脚锚点的目标。
+ */
+import { SITE, FOOTER_LINKS, SECTION_IDS } from '../../data/site';
+import { COPY } from '../../data/copy';
+---
+
+<footer id={SECTION_IDS.footer} class="relative overflow-hidden border-t border-line bg-ink-soft/40 py-14">
+  <span
+    aria-hidden="true"
+    class="aura aura--neon left-1/2 top-[-12rem] h-[22rem] w-[22rem] -translate-x-1/2 opacity-10"
+  ></span>
+
+  <div class="shell relative z-10 flex flex-col gap-10">
+    <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      <!-- 品牌 -->
+      <div class="flex flex-col gap-3">
+        <span class="text-lg font-bold text-heading">{SITE.brand}</span>
+        <span class="text-[0.6rem] tracking-[0.28em] text-body-dim">{SITE.brandLatin}</span>
+        <p class="mt-2 max-w-xs text-sm leading-relaxed text-body-dim">{COPY.footer.tagline}</p>
+      </div>
+
+      <!-- 导航链接 -->
+      <nav class="flex flex-col gap-3">
+        <h2 class="text-sm font-bold text-heading">页内导航</h2>
+        <ul class="flex flex-col gap-2">
+          {
+            FOOTER_LINKS.map((link) => (
+              <li>
+                <a href={link.href} class="text-sm text-body-dim transition-colors hover:text-neon">
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <!-- 客服联系方式 -->
+      <div class="flex flex-col gap-3">
+        <h2 class="text-sm font-bold text-heading">联系我们</h2>
+        <ul class="flex flex-col gap-2 text-sm text-body-dim">
+          <li>{SITE.support.qq}</li>
+          <li>{SITE.support.group}</li>
+        </ul>
+      </div>
+
+      <!-- 获取客户端 -->
+      <div class="flex flex-col gap-3">
+        <h2 class="text-sm font-bold text-heading">获取客户端</h2>
+        <a href={SITE.clientDownloadUrl} class="btn-ghost self-start text-sm">立即下载</a>
+        <p class="text-xs leading-relaxed text-body-dim">当前一期仅开放 Windows 客户端。</p>
+      </div>
+    </div>
+
+    <div
+      class="flex flex-col gap-2 border-t border-line pt-6 text-xs text-body-dim sm:flex-row sm:items-center sm:justify-between"
+    >
+      <span>{SITE.icp}</span>
+      <span>© {new Date().getFullYear()} {SITE.copyrightOwner} · 保留所有权利</span>
+    </div>
+  </div>
+</footer>

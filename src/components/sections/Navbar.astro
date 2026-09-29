@@ -1,0 +1,96 @@
+---
+/**
+ * 顶部导航：固定定位 + 半透明磨砂背景。
+ * 菜单项按 spec 的映射锚向页内板块：
+ *   海量游戏库 → 使用场景，帮助中心 → 四步上手，关于我们 → 页脚。
+ * 窄屏（<768px）折叠为汉堡菜单，用原生 JavaScript 切换类名实现，不引入 UI 框架。
+ */
+import { SITE, NAV_LINKS, SECTION_IDS } from '../../data/site';
+---
+
+<header class="nav-frost fixed inset-x-0 top-0 z-50">
+  <nav class="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
+    <a href={`#${SECTION_IDS.hero}`} class="flex flex-col leading-none">
+      <span class="text-base font-bold tracking-wide text-heading sm:text-lg">{SITE.brand}</span>
+      <span class="mt-0.5 text-[0.55rem] tracking-[0.28em] text-body-dim">{SITE.brandLatin}</span>
+    </a>
+
+    <!-- 宽屏菜单：视口 ≥768px 时横向完整展示 -->
+    <ul class="hidden items-center gap-8 md:flex">
+      {
+        NAV_LINKS.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="text-sm text-body transition-colors hover:text-neon"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="flex items-center gap-2">
+      <a href={SITE.clientDownloadUrl} class="btn-neon btn-neon--sm">
+        立即下载
+      </a>
+
+      <!-- 汉堡按钮：视口 <768px 时显示 -->
+      <button
+        id="nav-toggle"
+        type="button"
+        class="flex h-10 w-10 items-center justify-center rounded-lg border border-line text-heading md:hidden"
+        aria-controls="mobile-menu"
+        aria-expanded="false"
+        aria-label="展开导航菜单"
+      >
+        <span aria-hidden="true" class="flex flex-col gap-1.5">
+          <span class="block h-0.5 w-5 bg-current"></span>
+          <span class="block h-0.5 w-5 bg-current"></span>
+          <span class="block h-0.5 w-5 bg-current"></span>
+        </span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- 移动端菜单：默认收起，点击汉堡按钮展开 -->
+  <div id="mobile-menu" class="hidden border-t border-line px-6 pb-5 pt-2 md:hidden">
+    <ul class="flex flex-col">
+      {
+        NAV_LINKS.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="block border-b border-line-muted py-3 text-sm text-body transition-colors hover:text-neon"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</header>
+
+<script>
+  const toggle = document.getElementById('nav-toggle');
+  const menu = document.getElementById('mobile-menu');
+
+  if (toggle && menu) {
+    toggle.addEventListener('click', () => {
+      const willOpen = menu.classList.contains('hidden');
+      menu.classList.toggle('hidden', !willOpen);
+      toggle.setAttribute('aria-expanded', String(willOpen));
+      toggle.setAttribute('aria-label', willOpen ? '收起导航菜单' : '展开导航菜单');
+    });
+
+    // 选中任一菜单项后收起菜单
+    menu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        menu.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+</script>

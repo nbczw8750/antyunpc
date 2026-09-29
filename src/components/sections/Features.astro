@@ -1,0 +1,53 @@
+---
+/**
+ * 核心特性：四张绿色描边卖点卡片。
+ * 卡片之上叠加一条轮播展示带：载体为纯 CSS 抽象图形（无位图），
+ * 由 CSS scroll-snap 驱动横向停靠，不写 JavaScript，也不提供左右切换按钮。
+ * 视口 ≥1024px 一行四卡，＜1024px 两列网格。
+ */
+import { COPY } from '../../data/copy';
+import { SECTION_IDS } from '../../data/site';
+import { FEATURES } from '../../data/content';
+import SectionHeading from '../ui/SectionHeading.astro';
+import BackgroundFX from '../ui/BackgroundFX.astro';
+---
+
+<section id={SECTION_IDS.features} class="relative overflow-hidden py-20 sm:py-24">
+  <BackgroundFX
+    auras={[
+      { variant: 'blue', className: 'left-[-10rem] top-10 h-[22rem] w-[22rem]', opacity: 0.12 },
+    ]}
+  />
+
+  <div class="shell relative z-10 flex flex-col gap-12">
+    <SectionHeading
+      kicker={COPY.features.kicker}
+      title={COPY.features.title}
+      subtitle={COPY.features.subtitle}
+    />
+
+    <ul class="reel" tabindex="0" aria-label="核心特性视觉展示">
+      {
+        FEATURES.map((feature) => (
+          <li class="reel-item card-neon">
+            <span class="reel-visual" aria-hidden="true" />
+            <span class="text-[0.65rem] tracking-[0.22em] text-neon">{feature.tag}</span>
+            <span class="text-sm font-bold text-heading">{feature.title}</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <ul class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      {
+        FEATURES.map((feature) => (
+          <li class="card-neon flex h-full flex-col gap-3 p-5">
+            <span class="text-[0.65rem] tracking-[0.22em] text-neon">{feature.tag}</span>
+            <h3 class="text-base font-bold text-heading sm:text-lg">{feature.title}</h3>
+            <p class="text-sm leading-relaxed text-body">{feature.description}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,34 @@
+---
+/**
+ * 背景视觉层：网格光效 + 霓虹光晕。
+ * 全部由 CSS 生成（repeating-linear-gradient / radial-gradient），不加载任何位图。
+ * 纯装饰，标记 aria-hidden 不进入可访问性树。
+ */
+interface Aura {
+  /** 光晕颜色变体 */
+  variant: 'neon' | 'blue' | 'violet';
+  /** 尺寸与位置，使用 Tailwind 定位工具类 */
+  className: string;
+  /** 透明度，0-1 */
+  opacity?: number;
+}
+
+interface Props {
+  /** 网格形态：floor 为透视地面，flat 为平铺网格，none 为不绘制 */
+  grid?: 'floor' | 'flat' | 'none';
+  auras?: Aura[];
+}
+
+const { grid = 'none', auras = [] } = Astro.props;
+---
+
+<div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+  {auras.map((aura) => (
+    <span
+      class={`aura aura--${aura.variant} ${aura.className}`}
+      style={`opacity:${aura.opacity ?? 0.16}`}
+    />
+  ))}
+  {grid === 'floor' && <span class="grid-floor" />}
+  {grid === 'flat' && <span class="grid-flat" />}
+</div>

@@ -1,0 +1,19 @@
+---
+/**
+ * 状态角标基元。
+ * 上线状态用 badge-live，未上线状态用 badge-soon；
+ * 两种状态在页面上必须以文字呈现，不依赖颜色单独区分。
+ */
+interface Props {
+  status: 'available' | 'coming-soon';
+  label: string;
+}
+
+const { status, label } = Astro.props;
+const cls = status === 'available' ? 'badge-live' : 'badge-soon';
+---
+
+<span class={cls}>
+  {status === 'available' && <span aria-hidden="true">●</span>}
+  {label}
+</span>

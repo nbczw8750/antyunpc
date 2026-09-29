@@ -1,0 +1,499 @@
+@import "tailwindcss";
+
+/* ============================================================
+   设计令牌
+   所有色值集中在此声明。模板与组件只引用语义名，不得硬编码色值。
+   ============================================================ */
+@theme {
+  --color-ink: #000000;
+  --color-ink-soft: #0a0d12;
+  --color-line: #1e242e;
+  --color-line-muted: #14181f;
+  --color-neon: #39ff14;
+  --color-aura-blue: #3b82f6;
+  --color-aura-violet: #7c3aed;
+  --color-heading: #ffffff;
+  --color-body: #cccccc;
+  --color-body-dim: #7a808a;
+
+  --font-sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Source Han Sans SC", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* ============================================================
+   基础样式
+   ============================================================ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--color-ink);
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-body);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--color-heading);
+    font-weight: 700;
+  }
+
+  /* 固定导航会遮挡滚动目标，锚点板块预留顶部间距 */
+  section[id],
+  footer[id] {
+    scroll-margin-top: 5rem;
+  }
+
+  ::selection {
+    background-color: var(--color-neon);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-neon);
+    outline-offset: 2px;
+  }
+}
+
+/* 偏好减弱动效时关闭平滑滚动与过渡动画 */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   组件类
+   ============================================================ */
+@layer components {
+  /* ---------- 卡片：常规（圆角 + hover 发光） ---------- */
+  .card-neon {
+    position: relative;
+    border-radius: 1rem;
+    border: 1px solid var(--color-line);
+    background-color: color-mix(in srgb, var(--color-ink-soft) 88%, transparent);
+    transition: border-color 220ms ease, box-shadow 220ms ease,
+      transform 220ms ease;
+  }
+
+  .card-neon:hover {
+    border-color: var(--color-neon);
+    box-shadow: 0 0 0 1px var(--color-neon),
+      0 0 28px -6px var(--color-neon);
+    transform: translateY(-2px);
+  }
+
+  /* ---------- 卡片：未上线变体（降饱和描边） ---------- */
+  /* 状态同时由卡片内的文字角标表达，不依赖颜色单独区分 */
+  .card-muted {
+    position: relative;
+    border-radius: 1rem;
+    border: 1px dashed var(--color-line-muted);
+    background-color: color-mix(in srgb, var(--color-ink-soft) 52%, transparent);
+    opacity: 0.75;
+    filter: saturate(0.25);
+    transition: opacity 220ms ease, filter 220ms ease;
+  }
+
+  .card-muted:hover {
+    opacity: 0.9;
+    filter: saturate(0.45);
+  }
+
+  /* ---------- 按钮 ---------- */
+  .btn-neon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    background-color: var(--color-neon);
+    color: var(--color-ink);
+    font-weight: 700;
+    padding: 0.75rem 1.75rem;
+    box-shadow: 0 0 22px -6px var(--color-neon);
+    transition: box-shadow 200ms ease, transform 200ms ease;
+  }
+
+  .btn-neon:hover {
+    box-shadow: 0 0 34px -4px var(--color-neon);
+    transform: translateY(-1px);
+  }
+
+  /* 导航栏等紧凑场景下的按钮尺寸 */
+  .btn-neon--sm {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  /* 内容区最大宽度，避免超宽屏下内容被过度拉伸 */
+  .shell {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .shell {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in srgb, var(--color-neon) 55%, transparent);
+    color: var(--color-neon);
+    font-weight: 600;
+    padding: 0.75rem 1.75rem;
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--color-neon);
+    box-shadow: 0 0 20px -8px var(--color-neon);
+  }
+
+  /* ---------- 角标 ---------- */
+  .badge-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-neon);
+    color: var(--color-neon);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    padding: 0.125rem 0.625rem;
+  }
+
+  .badge-soon {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    border: 1px solid var(--color-line);
+    color: var(--color-body-dim);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    padding: 0.125rem 0.625rem;
+  }
+
+  /* 价格旁的「示意」标注：与价格数字紧邻，不可被省略 */
+  .badge-note {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in srgb, var(--color-neon) 45%, transparent);
+    color: var(--color-neon);
+    font-size: 0.6875rem;
+    line-height: 1rem;
+    padding: 0.0625rem 0.5rem;
+  }
+
+  /* ---------- 区块小标题 ---------- */
+  .section-kicker {
+    color: var(--color-neon);
+    font-size: 0.75rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  /* ---------- 导航磨砂层 ---------- */
+  .nav-frost {
+    background-color: color-mix(in srgb, var(--color-ink) 74%, transparent);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  /* ---------- 视觉层：全部由 CSS 生成，不含任何位图 ---------- */
+
+  /* 径向渐变光晕 */
+  .aura {
+    position: absolute;
+    border-radius: 9999px;
+    pointer-events: none;
+  }
+
+  .aura--neon {
+    background-image: radial-gradient(
+      closest-side,
+      var(--color-neon),
+      transparent 72%
+    );
+  }
+
+  .aura--blue {
+    background-image: radial-gradient(
+      closest-side,
+      var(--color-aura-blue),
+      transparent 72%
+    );
+  }
+
+  .aura--violet {
+    background-image: radial-gradient(
+      closest-side,
+      var(--color-aura-violet),
+      transparent 72%
+    );
+  }
+
+  /* 透视网格（首屏地面） */
+  .grid-floor {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+        to right,
+        var(--color-line) 0 1px,
+        transparent 1px 64px
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        var(--color-line) 0 1px,
+        transparent 1px 64px
+      );
+    transform: perspective(420px) rotateX(62deg);
+    transform-origin: bottom center;
+    -webkit-mask-image: linear-gradient(to top, black, transparent 76%);
+    mask-image: linear-gradient(to top, black, transparent 76%);
+  }
+
+  /* 平铺网格（区块背景） */
+  .grid-flat {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+        to right,
+        var(--color-line) 0 1px,
+        transparent 1px 56px
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        var(--color-line) 0 1px,
+        transparent 1px 56px
+      );
+    -webkit-mask-image: radial-gradient(
+      closest-side at 50% 40%,
+      black,
+      transparent 88%
+    );
+    mask-image: radial-gradient(
+      closest-side at 50% 40%,
+      black,
+      transparent 88%
+    );
+  }
+
+  /* 抽象显卡图形（计费板块配图） */
+  .gpu-card {
+    position: relative;
+    width: 100%;
+    max-width: 26rem;
+    aspect-ratio: 16 / 7;
+    border-radius: 0.9rem;
+    border: 1px solid var(--color-line);
+    background-image: linear-gradient(
+      150deg,
+      color-mix(in srgb, var(--color-ink-soft) 88%, var(--color-aura-violet)),
+      var(--color-ink)
+    );
+    box-shadow: inset 0 0 44px -22px var(--color-aura-blue);
+    overflow: hidden;
+  }
+
+  /* 散热鳍片 */
+  .gpu-card::before {
+    content: "";
+    position: absolute;
+    inset: 12% 8% 36% 8%;
+    background-image: repeating-linear-gradient(
+      to right,
+      var(--color-line) 0 2px,
+      transparent 2px 7px
+    );
+    opacity: 0.7;
+  }
+
+  /* 底部霓虹灯带 */
+  .gpu-card::after {
+    content: "";
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: 13%;
+    height: 2px;
+    background-color: var(--color-neon);
+    box-shadow: 0 0 18px 2px var(--color-neon);
+  }
+
+  .gpu-fan {
+    position: absolute;
+    bottom: 25%;
+    width: 25%;
+    aspect-ratio: 1;
+    border-radius: 9999px;
+    border: 1px solid var(--color-line);
+    background-image: radial-gradient(
+      closest-side,
+      color-mix(in srgb, var(--color-aura-blue) 38%, transparent),
+      transparent 74%
+    );
+  }
+
+  .gpu-fan--left {
+    left: 15%;
+  }
+
+  .gpu-fan--right {
+    right: 15%;
+  }
+
+  /* 步骤节点：绿色发光圆形 */
+  .step-node {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-neon);
+    color: var(--color-neon);
+    font-weight: 700;
+    background-color: color-mix(in srgb, var(--color-neon) 10%, transparent);
+    box-shadow: 0 0 20px -6px var(--color-neon);
+  }
+
+  /* ---------- 轮播展示带 ---------- */
+  /* 由 CSS scroll-snap 驱动，不写 JavaScript，也不提供左右切换按钮 */
+  .reel {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 0.25rem;
+    overscroll-behavior-x: contain;
+    padding-bottom: 0.75rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line) transparent;
+  }
+
+  .reel::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .reel::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  .reel::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background-color: var(--color-line);
+  }
+
+  .reel-item {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    gap: 0.5rem;
+    /* 宽度小于容器，使右侧露出下一项，提示可横向滑动 */
+    width: min(19rem, 82%);
+    padding: 0.75rem;
+    scroll-snap-align: center;
+  }
+
+  /* 展示带载体：纯 CSS 抽象图形，无位图 */
+  .reel-visual {
+    position: relative;
+    display: block;
+    height: 7.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-line);
+    overflow: hidden;
+    background-image: linear-gradient(
+      150deg,
+      color-mix(in srgb, var(--color-ink-soft) 86%, var(--color-aura-violet)),
+      var(--color-ink)
+    );
+  }
+
+  /* 载体上的透视网格 */
+  .reel-visual::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+        to right,
+        var(--color-line) 0 1px,
+        transparent 1px 22px
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        var(--color-line) 0 1px,
+        transparent 1px 22px
+      );
+    opacity: 0.6;
+    -webkit-mask-image: radial-gradient(
+      closest-side at 50% 55%,
+      black,
+      transparent 94%
+    );
+    mask-image: radial-gradient(closest-side at 50% 55%, black, transparent 94%);
+  }
+
+  /* 载体底部的霓虹光晕 */
+  .reel-visual::after {
+    content: "";
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: -34%;
+    height: 76%;
+    border-radius: 9999px;
+    background-image: radial-gradient(
+      closest-side,
+      var(--color-neon),
+      transparent 72%
+    );
+    opacity: 0.26;
+  }
+
+  /* 光晕按位置在荧光绿 / 蓝 / 紫之间轮换，避免四项视觉重复 */
+  .reel-item:nth-child(2) .reel-visual::after,
+  .reel-item:nth-child(4) .reel-visual::after {
+    background-image: radial-gradient(
+      closest-side,
+      var(--color-aura-blue),
+      transparent 72%
+    );
+  }
+
+  .reel-item:nth-child(3) .reel-visual::after {
+    background-image: radial-gradient(
+      closest-side,
+      var(--color-aura-violet),
+      transparent 72%
+    );
+  }
+}

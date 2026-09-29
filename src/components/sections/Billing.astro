@@ -1,0 +1,66 @@
+---
+/**
+ * 计费说明：按时长计费的方式说明、示意价提示，以及纯 CSS 绘制的显卡配图。
+ * 价格位置展示「以上为示意价，实际价格以客户端内实时公示为准」，
+ * 不把示意价表述为官方定价，模块内也不提供购买或充值入口。
+ */
+import { COPY } from '../../data/copy';
+import { SECTION_IDS } from '../../data/site';
+import SectionHeading from '../ui/SectionHeading.astro';
+import GpuArtwork from '../ui/GpuArtwork.astro';
+import BackgroundFX from '../ui/BackgroundFX.astro';
+
+const points = [
+  {
+    title: '按时长计费',
+    description: '以实际使用时长结算，用多久算多久，不必为闲置的算力买单。',
+  },
+  {
+    title: '计费粒度',
+    description: '计费的最小时间单位与起算方式以客户端内公示的规则为准。',
+  },
+  {
+    title: '规则以客户端为准',
+    description: '时长折扣、活动与资源调整等规则均在客户端内实时公示。',
+  },
+];
+---
+
+<section id={SECTION_IDS.billing} class="relative overflow-hidden py-20 sm:py-24">
+  <BackgroundFX
+    grid="flat"
+    auras={[
+      { variant: 'violet', className: 'left-[-10rem] bottom-0 h-[26rem] w-[26rem]', opacity: 0.16 },
+      { variant: 'neon', className: 'right-[-6rem] top-10 h-[18rem] w-[18rem]', opacity: 0.1 },
+    ]}
+  />
+
+  <div class="shell relative z-10 flex flex-col gap-12">
+    <SectionHeading
+      kicker={COPY.billing.kicker}
+      title={COPY.billing.title}
+      subtitle={COPY.billing.subtitle}
+    />
+
+    <div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
+      <div class="flex flex-col gap-6">
+        <ul class="flex flex-col gap-4">
+          {
+            points.map((point) => (
+              <li class="card-neon flex flex-col gap-2 p-5">
+                <h3 class="text-base font-bold text-heading">{point.title}</h3>
+                <p class="text-sm leading-relaxed text-body">{point.description}</p>
+              </li>
+            ))
+          }
+        </ul>
+
+        <p class="rounded-xl border border-line bg-ink-soft/70 px-5 py-4 text-sm text-neon">
+          {COPY.billing.priceNote}
+        </p>
+      </div>
+
+      <GpuArtwork />
+    </div>
+  </div>
+</section>

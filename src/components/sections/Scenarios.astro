@@ -1,0 +1,46 @@
+---
+/**
+ * 使用场景：三组图文场景。
+ * 「移动极客」场景标注 Android 客户端「敬请期待」，不宣称移动端当前可用。
+ * 这里的板块 id 同时是导航「海量游戏库」的锚点目标。
+ */
+import { COPY } from '../../data/copy';
+import { SCENARIOS } from '../../data/content';
+import { SECTION_IDS } from '../../data/site';
+import SectionHeading from '../ui/SectionHeading.astro';
+import BackgroundFX from '../ui/BackgroundFX.astro';
+---
+
+<section id={SECTION_IDS.scenarios} class="relative overflow-hidden py-20 sm:py-24">
+  <BackgroundFX
+    auras={[
+      { variant: 'neon', className: 'right-[-8rem] bottom-0 h-[22rem] w-[22rem]', opacity: 0.12 },
+      { variant: 'blue', className: 'left-[-8rem] top-10 h-[20rem] w-[20rem]', opacity: 0.12 },
+    ]}
+  />
+
+  <div class="shell relative z-10 flex flex-col gap-12">
+    <SectionHeading
+      kicker={COPY.scenarios.kicker}
+      title={COPY.scenarios.title}
+      subtitle={COPY.scenarios.subtitle}
+    />
+
+    <ul class="grid grid-cols-1 gap-4 md:grid-cols-3">
+      {
+        SCENARIOS.map((scenario, index) => (
+          <li class="card-neon flex h-full flex-col gap-4 p-6">
+            <span class="text-[0.65rem] tracking-[0.22em] text-neon">
+              {String(index + 1).padStart(2, '0')}
+            </span>
+            <h3 class="text-lg font-bold text-heading">{scenario.title}</h3>
+            <p class="text-sm leading-relaxed text-body">{scenario.description}</p>
+            {scenario.platformNote && (
+              <p class="mt-auto text-xs text-neon">{scenario.platformNote}</p>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
