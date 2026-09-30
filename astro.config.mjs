@@ -1,11 +1,11 @@
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 
-// 上线前必须替换：把下面的占位值换成真实的 GitHub 用户名与仓库名。
+// 真实仓库值：origin = github.com/nbczw8750/antyunpc。
 // base 必须保持 '/<仓库名>' 的形式，否则部署到 GitHub Pages 项目页后，
 // 静态资源与页内锚点都会 404。
-const GITHUB_USERNAME = 'USERNAME';
-const GITHUB_REPO = 'REPO';
+const GITHUB_USERNAME = 'nbczw8750';
+const GITHUB_REPO = 'antyunpc';
 
 export default defineConfig({
   site: `https://${GITHUB_USERNAME}.github.io`,
