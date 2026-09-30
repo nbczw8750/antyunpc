@@ -44,7 +44,7 @@ src/
 
 3. **启用 Pages** — 仓库 Settings → Pages，Source 选择 **GitHub Actions**。
 
-4. **推送** — 把代码推送到 `main` 分支。仓库已内置 `.github/workflows/deploy.yml`，会自动执行 `npm ci` → `npm run build` → 发布 `dist/`，无需手动提交构建产物。
+4. **推送** — 把代码推送到 `master` 分支。仓库已内置 `.github/workflows/deploy.yml`，会自动执行 `npm ci` → `npm run build` → 发布 `dist/`，无需手动提交构建产物。
 
 5. **访问验证** — 打开 `https://<用户名>.github.io/<仓库名>/`，确认样式、光效与锚点均正常，浏览器控制台无资源 404。
 
@@ -64,7 +64,7 @@ src/
 | `company` | `src/data/site.ts` | 公司主体名称（如需要展示） |
 | `price` | `src/data/plans.ts` | 畅玩与电竞两档的示意价（当前为 `¥4 / 小时`、`¥6 / 小时`） |
 
-另有 `astro.config.mjs` 中的 `GITHUB_USERNAME` 与 `GITHUB_REPO`，同样属于上线前必须替换的占位值。
+`astro.config.mjs` 中的 `GITHUB_USERNAME` 与 `GITHUB_REPO` 同属此类占位值，现已填入真实值（`nbczw8750` / `antyunpc`）。
 
 > `plans.ts` 里的两档价格是**示意值，不是官方定价**。上线前必须重新确认或替换，否则它会从「示意」变成事实上的真实价。每个价格数字旁必须保留「示意」标注（`priceNote` 字段），不得单独呈现数字。
 
