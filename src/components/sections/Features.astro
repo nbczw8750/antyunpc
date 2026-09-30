@@ -1,8 +1,10 @@
 ---
 /**
- * 核心特性：四张绿色描边卖点卡片。
- * 卡片之上叠加一条轮播展示带：载体为纯 CSS 抽象图形（无位图），
- * 由 CSS scroll-snap 驱动横向停靠，不写 JavaScript，也不提供左右切换按钮。
+ * 核心特性：四张绿色描边卖点卡片，卡片驱动整幅背景场景 banner。
+ * 背景场景为纯 CSS 图形（零位图、零脚本）：
+ *   点按/键盘切换由卡片内的隐藏 radio 承担（状态粘性），
+ *   指针悬停由 :has() 叠加覆盖，移开后回落到已选中场景，
+ *   无任何交互时显示常驻默认场景兜底。
  * 视口 ≥1024px 一行四卡，＜1024px 两列网格。
  */
 import { COPY } from '../../data/copy';
@@ -12,7 +14,18 @@ import SectionHeading from '../ui/SectionHeading.astro';
 import BackgroundFX from '../ui/BackgroundFX.astro';
 ---
 
-<section id={SECTION_IDS.features} class="relative overflow-hidden py-20 sm:py-24">
+<section id={SECTION_IDS.features} class="features relative overflow-hidden py-20 sm:py-24">
+  <!-- 背景场景层：整幅覆盖、纯装饰，不参与朗读 -->
+  <div class="feature-scenes" aria-hidden="true">
+    <span class="scene scene--default"></span>
+    <span class="scene scene--gpu"><span class="scene-chip"></span></span>
+    <span class="scene scene--latency"><span class="grid-floor"></span></span>
+    <span class="scene scene--memory"></span>
+    <span class="scene scene--nodownload"></span>
+    <!-- 上下渐变黑纱：保证标题与正文对比度 -->
+    <span class="feature-scrim"></span>
+  </div>
+
   <BackgroundFX
     auras={[
       { variant: 'blue', className: 'left-[-10rem] top-10 h-[22rem] w-[22rem]', opacity: 0.12 },
@@ -26,25 +39,25 @@ import BackgroundFX from '../ui/BackgroundFX.astro';
       subtitle={COPY.features.subtitle}
     />
 
-    <ul class="reel" tabindex="0" aria-label="核心特性视觉展示">
-      {
-        FEATURES.map((feature) => (
-          <li class="reel-item card-neon">
-            <span class="reel-visual" aria-hidden="true" />
-            <span class="text-[0.65rem] tracking-[0.22em] text-neon">{feature.tag}</span>
-            <span class="text-sm font-bold text-heading">{feature.title}</span>
-          </li>
-        ))
-      }
-    </ul>
-
     <ul class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
       {
-        FEATURES.map((feature) => (
-          <li class="card-neon flex h-full flex-col gap-3 p-5">
+        FEATURES.map((feature, index) => (
+          <li class="feature-card card-neon p-5" data-f={feature.id}>
+            <input
+              type="radio"
+              name="feature-scene"
+              id={`f-${feature.id}`}
+              class="sr-only"
+              checked={index === 0}
+              aria-label={`切换背景：${feature.title}`}
+            />
             <span class="text-[0.65rem] tracking-[0.22em] text-neon">{feature.tag}</span>
             <h3 class="text-base font-bold text-heading sm:text-lg">{feature.title}</h3>
             <p class="text-sm leading-relaxed text-body">{feature.description}</p>
+            <!-- 整卡点击热区：覆盖层 label，保持 h3 等语义结构不被 label 包裹 -->
+            <label for={`f-${feature.id}`} class="feature-card__hit">
+              <span class="sr-only">切换到「{feature.title}」背景</span>
+            </label>
           </li>
         ))
       }

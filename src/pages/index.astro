@@ -14,6 +14,10 @@ import { SITE } from '../data/site';
 import { COPY } from '../data/copy';
 
 const description = `${SITE.brand} · ${COPY.hero.title}。${COPY.hero.subtitle}`;
+
+// 站点部署在 base 子路径下（dev 与 GitHub Pages 项目页同理），
+// 资源路径必须基于 BASE_URL 拼接；相对路径在无尾部斜杠的 URL 下会解析错位。
+const iconHref = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/favicon.svg`;
 ---
 
 <!doctype html>
@@ -24,6 +28,7 @@ const description = `${SITE.brand} · ${COPY.hero.title}。${COPY.hero.subtitle}
     <title>{SITE.brand} · 云端电竞主机</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content="#000000" />
+    <link rel="icon" type="image/svg+xml" href={iconHref} />
     <meta property="og:title" content={`${SITE.brand} · 云端电竞主机`} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />

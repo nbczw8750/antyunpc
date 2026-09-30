@@ -2,12 +2,12 @@
  * 首屏平台下载卡数据。
  *
  * 口径说明：
- * - 一期仅 Windows 客户端开放下载，其余三个平台均未上线。
- * - 未上线平台 href 为 null，卡片不提供可点击链接；
- *   上线状态同时由 statusLabel 文字表达，不依赖颜色单独区分。
+ * - 下载地址接入前，四个平台的 href 一律为 null，卡片不提供任何跳转：
+ *   Windows 标注「一期开放」仅表达资源状态，下载通道尚未接入；
+ *   macOS / Android / H5 均未上线，标注「敬请期待」。
+ * - 上线状态同时由 statusLabel 文字表达，不依赖颜色单独区分。
+ * - 接入真实下载地址后，恢复可下载平台的 href 即可。
  */
-
-import { SITE } from './site';
 
 export type PlatformStatus = 'available' | 'coming-soon';
 
@@ -16,7 +16,7 @@ export interface Platform {
   name: string;
   /** 平台副标题 / 说明 */
   note: string;
-  /** 可下载平台指向下载地址；未上线平台为 null */
+  /** 下载地址接入前一律为 null（不提供跳转）；接入后可下载平台指向下载地址 */
   href: string | null;
   status: PlatformStatus;
   statusLabel: string;
@@ -27,7 +27,7 @@ export const PLATFORMS: readonly Platform[] = [
     id: 'windows',
     name: 'Windows',
     note: 'Windows 10 / 11 · 64 位',
-    href: SITE.clientDownloadUrl,
+    href: null,
     status: 'available',
     statusLabel: '一期开放',
   },

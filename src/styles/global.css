@@ -370,8 +370,10 @@
     right: 15%;
   }
 
-  /* 步骤节点：绿色发光圆形 */
+  /* 步骤节点：绿色发光圆形；不透明底 + 提层级以压住连接段端点 */
   .step-node {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -381,119 +383,407 @@
     border: 1px solid var(--color-neon);
     color: var(--color-neon);
     font-weight: 700;
-    background-color: color-mix(in srgb, var(--color-neon) 10%, transparent);
+    background-color: var(--color-ink);
     box-shadow: 0 0 20px -6px var(--color-neon);
+    transition:
+      transform 240ms ease,
+      box-shadow 240ms ease,
+      border-color 240ms ease;
   }
 
-  /* ---------- 轮播展示带 ---------- */
-  /* 由 CSS scroll-snap 驱动，不写 JavaScript，也不提供左右切换按钮 */
-  .reel {
-    display: flex;
-    gap: 1rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 0.25rem;
-    overscroll-behavior-x: contain;
-    padding-bottom: 0.75rem;
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-line) transparent;
-  }
-
-  .reel::-webkit-scrollbar {
-    height: 6px;
-  }
-
-  .reel::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-
-  .reel::-webkit-scrollbar-thumb {
-    border-radius: 9999px;
-    background-color: var(--color-line);
-  }
-
-  .reel-item {
-    display: flex;
-    flex: 0 0 auto;
-    flex-direction: column;
-    gap: 0.5rem;
-    /* 宽度小于容器，使右侧露出下一项，提示可横向滑动 */
-    width: min(19rem, 82%);
-    padding: 0.75rem;
-    scroll-snap-align: center;
-  }
-
-  /* 展示带载体：纯 CSS 抽象图形，无位图 */
-  .reel-visual {
+  /* ---------- 四步上手：连接轨与悬停进度反馈 ---------- */
+  /* li 需要定位上下文来绘制连接段 */
+  .step {
     position: relative;
-    display: block;
-    height: 7.5rem;
-    border-radius: 0.75rem;
-    border: 1px solid var(--color-line);
-    overflow: hidden;
-    background-image: linear-gradient(
-      150deg,
-      color-mix(in srgb, var(--color-ink-soft) 86%, var(--color-aura-violet)),
-      var(--color-ink)
-    );
   }
 
-  /* 载体上的透视网格 */
-  .reel-visual::before {
-    content: "";
+  /* 连接段基态：默认竖轨（<640px 单列）
+     几何与布局类耦合：节点圆 48px、grid gap-8 = 32px */
+  .step::after {
+    content: '';
+    position: absolute;
+    left: 23px;
+    top: 48px;
+    width: 2px;
+    height: calc(100% - 48px + 32px);
+    background-color: var(--color-line);
+    pointer-events: none;
+    transition:
+      background-color 240ms ease,
+      box-shadow 240ms ease;
+  }
+
+  /* 单列（<640px）：末项之后没有节点，断开 */
+  .step:last-child::after {
+    display: none;
+  }
+
+  /* 两列（640–1023px）：每列一条竖轨，第 3 项是左列末项
+     （第 4 项已由 last-child 断开）；该断点轨道为纯装饰 */
+  @media (min-width: 640px) and (max-width: 1023.98px) {
+    .step:nth-child(3)::after {
+      display: none;
+    }
+  }
+
+  /* 宽屏（≥1024px）：横轨贯穿四个节点圆心
+     几何与布局类耦合：lg:gap-6 = 24px、节点圆 48px */
+  @media (min-width: 1024px) {
+    .step::after {
+      left: calc(50% + 24px);
+      top: 23px;
+      width: calc(100% - 24px);
+      height: 2px;
+    }
+  }
+
+  /* 进度点亮：排在被悬停项之前的所有已走段 */
+  .step:has(~ .step:hover)::after {
+    background-color: var(--color-neon);
+    box-shadow: 0 0 14px -3px var(--color-neon);
+  }
+
+  /* 被悬停步骤的局部反馈：节点放大加强发光、标题转荧光绿、描述提亮上浮 */
+  .step:hover .step-node {
+    transform: scale(1.14);
+    border-color: var(--color-neon);
+    box-shadow:
+      0 0 26px -4px var(--color-neon),
+      inset 0 0 14px -6px var(--color-neon);
+  }
+
+  .step:hover h3 {
+    color: var(--color-neon);
+  }
+
+  .step:hover p {
+    color: var(--color-heading);
+    transform: translateY(-2px);
+  }
+
+  .step h3,
+  .step p {
+    transition:
+      color 240ms ease,
+      transform 240ms ease;
+  }
+
+  /* ---------- 核心特性：卡片布局、选中态与点击热区 ---------- */
+  .feature-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    height: 100%;
+  }
+
+  /* 整卡点击热区：覆盖层 label，覆盖卡片全部内边距区域 */
+  .feature-card__hit {
     position: absolute;
     inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    cursor: pointer;
+  }
+
+  /* 选中态：描边转荧光绿 + 内圈光晕 + 抬升；hover 移开后仍保持 */
+  .feature-card:has(input:checked) {
+    border-color: var(--color-neon);
+    box-shadow: 0 0 0 1px var(--color-neon), 0 0 36px -6px var(--color-neon),
+      inset 0 0 26px -14px var(--color-neon);
+    transform: translateY(-2px);
+  }
+
+  /* 键盘聚焦：轮廓落在整卡上（radio 本体为 sr-only，轮廓会被裁剪） */
+  .feature-card:has(input:focus-visible) {
+    outline: 2px solid var(--color-neon);
+    outline-offset: 2px;
+  }
+
+  /* ---------- 核心特性：整幅背景场景 banner ---------- */
+  /* 整层不接收指针事件、纯装饰（标记层带 aria-hidden），零位图、零脚本 */
+  .feature-scenes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .scene {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 420ms ease;
+  }
+
+  /* 默认场景：常驻底层，无交互或 :has() 不可用时的兜底 */
+  .scene--default {
+    opacity: 1;
+    background-color: var(--color-ink);
+    background-image: radial-gradient(
+        closest-side at 50% 46%,
+        color-mix(in srgb, var(--color-neon) 14%, transparent),
+        transparent 76%
+      ),
+      repeating-linear-gradient(to right, var(--color-line) 0 1px, transparent 1px 72px),
+      repeating-linear-gradient(to bottom, var(--color-line) 0 1px, transparent 1px 72px);
+    background-size: 58% 66%, 100% 100%, 100% 100%;
+    background-position: center, center, center;
+    background-repeat: no-repeat;
+  }
+
+  /* GPU：散热鳍片阵列 + 荧光绿辉光（右置构图）+ 芯片轮廓 */
+  .scene--gpu {
+    background-color: var(--color-ink);
     background-image: repeating-linear-gradient(
         to right,
-        var(--color-line) 0 1px,
-        transparent 1px 22px
+        color-mix(in srgb, var(--color-neon) 30%, transparent) 0 2px,
+        transparent 2px 14px
+      ),
+      radial-gradient(
+        closest-side at 50% 50%,
+        color-mix(in srgb, var(--color-neon) 26%, transparent),
+        transparent 78%
+      ),
+      radial-gradient(
+        closest-side at 50% 50%,
+        color-mix(in srgb, var(--color-neon) 10%, transparent),
+        transparent 82%
+      );
+    background-size: 40% 44%, 62% 68%, 100% 100%;
+    background-position: 64% 52%, 66% 50%, center;
+    background-repeat: no-repeat;
+  }
+
+  /* 芯片轮廓：旋转 45° 的方形描边 */
+  .scene-chip {
+    position: absolute;
+    top: 50%;
+    left: 66%;
+    width: min(22rem, 46vw);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%) rotate(45deg);
+    border: 1px solid color-mix(in srgb, var(--color-neon) 55%, transparent);
+    border-radius: 0.75rem;
+    box-shadow: 0 0 34px -12px var(--color-neon),
+      inset 0 0 34px -18px var(--color-neon);
+  }
+
+  /* LATENCY：透视地面（子元素 grid-floor）+ 节点连线（蓝色）
+     节点与光束用 calc(100% - Npx) 贴底定位：卡片行下方在所有断点
+     都恒有 ≥80px 的内边距空带，避免百分比定位落到卡片背后被遮挡 */
+  .scene--latency {
+    background-color: var(--color-ink);
+    background-image: radial-gradient(
+        circle at 22% calc(100% - 68px),
+        color-mix(in srgb, var(--color-aura-blue) 92%, transparent) 0 5px,
+        color-mix(in srgb, var(--color-aura-blue) 38%, transparent) 6px 15px,
+        transparent 17px
+      ),
+      radial-gradient(
+        circle at 54% calc(100% - 68px),
+        color-mix(in srgb, var(--color-aura-blue) 92%, transparent) 0 6px,
+        color-mix(in srgb, var(--color-aura-blue) 42%, transparent) 7px 18px,
+        transparent 20px
+      ),
+      radial-gradient(
+        circle at 82% calc(100% - 68px),
+        color-mix(in srgb, var(--color-aura-blue) 92%, transparent) 0 5px,
+        color-mix(in srgb, var(--color-aura-blue) 38%, transparent) 6px 15px,
+        transparent 17px
+      ),
+      linear-gradient(
+        to right,
+        transparent 16%,
+        color-mix(in srgb, var(--color-aura-blue) 70%, transparent) 18% 82%,
+        transparent 84%
+      ),
+      radial-gradient(
+        ellipse 46% 130px at 50% calc(100% - 60px),
+        color-mix(in srgb, var(--color-aura-blue) 40%, transparent),
+        transparent 78%
+      );
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 2px, 100% 100%;
+    background-position: 0 0, 0 0, 0 0, center calc(100% - 69px), 0 0;
+    background-repeat: no-repeat;
+  }
+
+  /* 场景内的透视地面改用蓝色线条，黑底上才可辨 */
+  .scene--latency .grid-floor {
+    background-image: repeating-linear-gradient(
+        to right,
+        color-mix(in srgb, var(--color-aura-blue) 32%, transparent) 0 1px,
+        transparent 1px 64px
       ),
       repeating-linear-gradient(
         to bottom,
-        var(--color-line) 0 1px,
-        transparent 1px 22px
+        color-mix(in srgb, var(--color-aura-blue) 32%, transparent) 0 1px,
+        transparent 1px 64px
       );
-    opacity: 0.6;
-    -webkit-mask-image: radial-gradient(
-      closest-side at 50% 55%,
-      black,
-      transparent 94%
-    );
-    mask-image: radial-gradient(closest-side at 50% 55%, black, transparent 94%);
   }
 
-  /* 载体底部的霓虹光晕 */
-  .reel-visual::after {
-    content: "";
+  /* MEMORY：堆叠条状矩阵（左置构图，紫色） */
+  .scene--memory {
+    background-color: var(--color-ink);
+    background-image: repeating-linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-aura-violet) 36%, transparent) 0 10px,
+        transparent 10px 26px
+      ),
+      repeating-linear-gradient(
+        to right,
+        color-mix(in srgb, var(--color-aura-violet) 22%, transparent) 0 2px,
+        transparent 2px 46px
+      ),
+      radial-gradient(
+        closest-side at 50% 50%,
+        color-mix(in srgb, var(--color-aura-violet) 26%, transparent),
+        transparent 76%
+      );
+    /* 矩阵条带定位到 y≈212..512：上沿贴副标题下缘、下沿穿出卡片行，
+       在标题带与卡片下方空带都留有可见构图（各断点按比例自适应） */
+    background-size: 46% 56%, 46% 56%, 64% 72%;
+    background-position: 60% 90%, 60% 90%, 36% 50%;
+    background-repeat: no-repeat;
+  }
+
+  /* NO INSTALL：向上飘散的粒子流（绿偏蓝）+ 底部辉光 + 上升光痕 */
+  .scene--nodownload {
+    background-color: var(--color-ink);
+    background-image: linear-gradient(
+        to top,
+        color-mix(
+          in srgb,
+          color-mix(in srgb, var(--color-neon) 55%, var(--color-aura-blue)) 60%,
+          transparent
+        ),
+        transparent
+      ),
+      linear-gradient(
+        to top,
+        color-mix(
+          in srgb,
+          color-mix(in srgb, var(--color-neon) 55%, var(--color-aura-blue)) 60%,
+          transparent
+        ),
+        transparent
+      ),
+      linear-gradient(
+        to top,
+        color-mix(
+          in srgb,
+          color-mix(in srgb, var(--color-neon) 55%, var(--color-aura-blue)) 60%,
+          transparent
+        ),
+        transparent
+      ),
+      radial-gradient(
+        circle at 20% calc(100% - 40px),
+        color-mix(in srgb, var(--color-neon) 62%, var(--color-aura-blue)) 0 4px,
+        transparent 5px
+      ),
+      radial-gradient(
+        circle at 47% calc(100% - 26px),
+        color-mix(in srgb, var(--color-neon) 62%, var(--color-aura-blue)) 0 4px,
+        transparent 5px
+      ),
+      radial-gradient(
+        circle at 74% calc(100% - 44px),
+        color-mix(in srgb, var(--color-neon) 62%, var(--color-aura-blue)) 0 3px,
+        transparent 4px
+      ),
+      radial-gradient(
+        circle at 8% 78%,
+        color-mix(in srgb, var(--color-neon) 62%, var(--color-aura-blue)) 0 4px,
+        transparent 5px
+      ),
+      radial-gradient(
+        circle at 5% 26%,
+        color-mix(in srgb, var(--color-neon) 62%, var(--color-aura-blue)) 0 3px,
+        transparent 4px
+      ),
+      radial-gradient(
+        circle at 95% 18%,
+        color-mix(in srgb, var(--color-neon) 62%, var(--color-aura-blue)) 0 3px,
+        transparent 4px
+      ),
+      radial-gradient(
+        circle at 94% 46%,
+        color-mix(in srgb, var(--color-neon) 62%, var(--color-aura-blue)) 0 3px,
+        transparent 4px
+      ),
+      radial-gradient(
+        circle at 50% 64%,
+        color-mix(in srgb, var(--color-neon) 62%, var(--color-aura-blue)) 0 3px,
+        transparent 4px
+      ),
+      radial-gradient(
+        circle at 40% 44%,
+        color-mix(in srgb, var(--color-neon) 62%, var(--color-aura-blue)) 0 3px,
+        transparent 4px
+      ),
+      radial-gradient(
+        circle at 74% 38%,
+        color-mix(in srgb, var(--color-neon) 62%, var(--color-aura-blue)) 0 3px,
+        transparent 4px
+      ),
+      radial-gradient(
+        circle at 24% 34%,
+        color-mix(in srgb, var(--color-neon) 62%, var(--color-aura-blue)) 0 2px,
+        transparent 3px
+      ),
+      radial-gradient(
+        circle at 56% 44%,
+        color-mix(in srgb, var(--color-neon) 62%, var(--color-aura-blue)) 0 2px,
+        transparent 3px
+      ),
+      radial-gradient(
+        ellipse 42% 150px at 50% calc(100% - 52px),
+        color-mix(in srgb, var(--color-neon) 46%, transparent),
+        transparent 82%
+      );
+    background-size: 3px 130px, 3px 100px, 3px 115px, 100% 100%, 100% 100%,
+      100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%,
+      100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+    background-position: 24% 100%, 56% 100%, 82% 100%, 0 0, 0 0, 0 0, 0 0,
+      0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+    background-repeat: no-repeat;
+  }
+
+  /* 场景切换（零 JavaScript）：
+     1) 无悬停时由选中卡片决定场景；
+     2) 悬停时先整体压暗（0,5,0，压过 checked 规则的 0,4,1），
+        再点亮被悬停场景（与压暗同特异性、位置居后者胜出），
+        指针移开后压暗/点亮规则失效，回落到选中场景。
+     注意：本环境的 Chromium 不允许 :has() 内再嵌 :has()，
+     因此 checked 条件写成单层 :has([data-f] input:checked)。 */
+  .features:has([data-f="gpu"] input:checked) .scene--gpu,
+  .features:has([data-f="latency"] input:checked) .scene--latency,
+  .features:has([data-f="memory"] input:checked) .scene--memory,
+  .features:has([data-f="nodownload"] input:checked) .scene--nodownload {
+    opacity: 1;
+  }
+
+  .features:has(.feature-card:hover) .feature-scenes .scene {
+    opacity: 0;
+  }
+
+  .features:has([data-f="gpu"]:hover) .feature-scenes .scene--gpu,
+  .features:has([data-f="latency"]:hover) .feature-scenes .scene--latency,
+  .features:has([data-f="memory"]:hover) .feature-scenes .scene--memory,
+  .features:has([data-f="nodownload"]:hover) .feature-scenes .scene--nodownload {
+    opacity: 1;
+  }
+
+  /* 上下渐变黑纱：顶部压暗保证标题对比度，中下段放行让场景可辨 */
+  .feature-scrim {
     position: absolute;
-    left: 8%;
-    right: 8%;
-    bottom: -34%;
-    height: 76%;
-    border-radius: 9999px;
-    background-image: radial-gradient(
-      closest-side,
-      var(--color-neon),
-      transparent 72%
-    );
-    opacity: 0.26;
-  }
-
-  /* 光晕按位置在荧光绿 / 蓝 / 紫之间轮换，避免四项视觉重复 */
-  .reel-item:nth-child(2) .reel-visual::after,
-  .reel-item:nth-child(4) .reel-visual::after {
-    background-image: radial-gradient(
-      closest-side,
-      var(--color-aura-blue),
-      transparent 72%
-    );
-  }
-
-  .reel-item:nth-child(3) .reel-visual::after {
-    background-image: radial-gradient(
-      closest-side,
-      var(--color-aura-violet),
-      transparent 72%
+    inset: 0;
+    background-image: linear-gradient(
+      to bottom,
+      var(--color-ink) 0%,
+      color-mix(in srgb, var(--color-ink) 72%, transparent) 18%,
+      color-mix(in srgb, var(--color-ink) 22%, transparent) 46%,
+      color-mix(in srgb, var(--color-ink) 18%, transparent) 82%,
+      color-mix(in srgb, var(--color-ink) 45%, transparent) 100%
     );
   }
 }

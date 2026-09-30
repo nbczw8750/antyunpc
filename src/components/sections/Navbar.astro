@@ -1,8 +1,9 @@
 ---
 /**
  * 顶部导航：固定定位 + 半透明磨砂背景。
- * 菜单项按 spec 的映射锚向页内板块：
- *   海量游戏库 → 使用场景，帮助中心 → 四步上手，关于我们 → 页脚。
+ * 菜单项为五项「板块名直导航」，标签与锚向板块同名且顺序一致：
+ *   核心特性、产品套餐、使用场景、计费说明、四步上手；
+ *   返回首屏的入口由左侧品牌标识（锚 #hero）承担。
  * 窄屏（<768px）折叠为汉堡菜单，用原生 JavaScript 切换类名实现，不引入 UI 框架。
  */
 import { SITE, NAV_LINKS, SECTION_IDS } from '../../data/site';
@@ -32,9 +33,9 @@ import { SITE, NAV_LINKS, SECTION_IDS } from '../../data/site';
     </ul>
 
     <div class="flex items-center gap-2">
-      <a href={SITE.clientDownloadUrl} class="btn-neon btn-neon--sm">
+      <button type="button" class="btn-neon btn-neon--sm">
         立即下载
-      </a>
+      </button>
 
       <!-- 汉堡按钮：视口 <768px 时显示 -->
       <button

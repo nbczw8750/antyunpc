@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- 欧竞云电竞 · 临时文字 favicon（正式 Logo 交付后替换） -->
+  <rect width="64" height="64" rx="14" fill="#090c0b"/>
+  <rect x="3.5" y="3.5" width="57" height="57" rx="11" fill="none" stroke="#bbff36" stroke-width="2"/>
+  <text x="32" y="44" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="34" font-weight="800" fill="#bbff36" text-anchor="middle">欧</text>
+</svg>

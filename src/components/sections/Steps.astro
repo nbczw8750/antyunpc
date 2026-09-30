@@ -2,7 +2,10 @@
 /**
  * 四步上手：时间轴形式的四个步骤，
  * 顺序为下载客户端、一键登录、快速实名、选游戏即刻开玩。
- * 步骤节点为绿色发光圆形。
+ * 步骤节点为绿色发光圆形；相邻节点由 li 伪元素绘制的连接轨相连，
+ * 悬停时已走轨段点亮（规则见 global.css 的 .step 段）。
+ * h3/p 不再携带 text-heading/text-body 工具类：基色分别由 base 层
+ * 标题规则与 body 继承给出（色值相同），避免工具类压过 .step 悬停变色。
  */
 import { COPY } from '../../data/copy';
 import { STEPS } from '../../data/content';
@@ -28,13 +31,13 @@ import BackgroundFX from '../ui/BackgroundFX.astro';
     <ol class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
       {
         STEPS.map((step) => (
-          <li class="flex gap-4 lg:flex-col lg:items-center lg:text-center">
+          <li class="step flex gap-4 lg:flex-col lg:items-center lg:text-center">
             <span class="step-node shrink-0" aria-hidden="true">
-              {step.order}
+              {String(step.order).padStart(2, '0')}
             </span>
             <div class="flex flex-col gap-2">
-              <h3 class="text-base font-bold text-heading">{step.title}</h3>
-              <p class="text-sm leading-relaxed text-body">{step.description}</p>
+              <h3 class="text-base font-bold">{step.title}</h3>
+              <p class="text-sm leading-relaxed">{step.description}</p>
             </div>
           </li>
         ))
